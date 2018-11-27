@@ -1,0 +1,33 @@
+
+executable("flutter") {
+  include_dirs = [
+    root_out_dir
+  ]
+
+  lib_dirs = [
+    root_out_dir
+  ]
+
+  sources = [
+    "flutter_application.h",
+    "flutter_application.cc",
+    "macros.h",
+    "main.cc",
+    "utils.cc",
+    "utils.h",
+    "pi_display.h",
+    "pi_display.cc",
+  ]
+
+  libs = [
+    "rt",
+    "brcmEGL",
+    "brcmGLESv2",
+    "flutter_engine",
+    "pthread",
+    "dl",
+    "bcm_host",
+    "vcos",
+    "vchiq_arm",
+  ]
+}

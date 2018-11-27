@@ -1,0 +1,114 @@
+declare_args() {
+  # The path to functional Clang toolchain capable of building the target triple.
+  toolchain_path = ""
+
+  # The path to the target system sysroot.
+  sysroot_path = ""
+
+  # The target. For example: "arm-linux-gnueabihf" for Raspberry Pi.
+  target_triple = ""
+
+  # Path to extra system inlcude directories relative to the sysroot. For example: "/opt/vc/include" on the Raspberry Pi.
+  extra_system_include_dirs = []
+
+  # Path to extra system library directories relative to the sysroot. For example: "/opt/vc/lib" on the Raspberry Pi.
+  extra_system_lib_dirs = []
+}
+
+toolchain("clang") {
+  assert(toolchain_path != "", "Toolchain must be specified")
+  assert(sysroot_path != "", "Sysroot must be specified")
+  assert(target_triple != "", "Target triple must be specified")
+
+  # Setup path to the tools to invoke
+  cc = "${toolchain_path}/bin/clang"
+  cxx = "${toolchain_path}/bin/clang++"
+  ld = "${toolchain_path}/bin/clang"
+  ar = "${toolchain_path}/bin/$target_triple-ar"
+
+  # Setup the target triple, this needs is required for all tool invocations.
+  target_triple_command = "--target=$target_triple"
+  sysroot_command = "--sysroot $sysroot_path"
+
+  # Add extra headers search directories for folders relative to sysroot.
+  extra_system_include_dirs_string = "-isysroot $sysroot_path"
+  foreach(extra_system_include_dir, extra_system_include_dirs) {
+    extra_system_include_dirs_string = "$extra_system_include_dirs_string -iwithsysroot $extra_system_include_dir"
+  }
+
+  # Add extra library search paths for folders relative to sysroot.
+  extra_system_lib_dirs_string = ""
+  foreach(extra_system_lib_dir, extra_system_lib_dirs) {
+    extra_system_lib_dirs_string =
+        "$extra_system_lib_dirs_string -L$sysroot_path/$extra_system_lib_dir"
+  }
+
+  # Common GN verbiage.
+  lib_switch = "-l"
+  lib_dir_switch = "-L"
+
+  # Common description prefixes in non-verbose invocation.
+  pretty_build_prefix = "🔨 "
+  pretty_link_prefix = "⛓️ "
+
+  tool("cc") {
+    depfile = "{{output}}.deps"
+    command = "$cc -o {{output}} -MMD -MF $depfile -c $target_triple_command $sysroot_command $extra_system_include_dirs_string {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} {{source}}"
+    outputs = [
+      "{{target_out_dir}}/{{target_output_name}}/objects/{{source_name_part}}.o",
+    ]
+    depsformat = "gcc"
+    description = "$pretty_build_prefix CC: {{source_name_part}}"
+  }
+
+  tool("cxx") {
+    depfile = "{{output}}.deps"
+    command = "$cxx -o {{output}} -MMD -MF $depfile -c $target_triple_command $sysroot_command $extra_system_include_dirs_string {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} {{source}}"
+    outputs = [
+      "{{target_out_dir}}/{{target_output_name}}/objects/{{source_name_part}}.o",
+    ]
+    depsformat = "gcc"
+    description = "$pretty_build_prefix CXX: {{source_name_part}}"
+  }
+
+  tool("alink") {
+    rspfile = "{{output}}.rsp"
+    command = "rm -f {{output}} && $ar rcs {{output}} @$rspfile"
+    description = "$pretty_link_prefix Archive: {{output}}"
+    rspfile_content = "{{inputs}}"
+    outputs = [
+      "{{target_out_dir}}/{{target_output_name}}{{output_extension}}",
+    ]
+    default_output_extension = ".a"
+    output_prefix = "lib"
+  }
+
+  tool("solink") {
+    outfile = "{{target_out_dir}}/{{target_output_name}}{{output_extension}}"
+    rspfile = "{{output}}.rsp"
+    rspfile_content = "{{inputs}}"
+    command = "$ld -o $outfile $target_triple_command $sysroot_command $extra_system_lib_dirs_string -shared {{ldflags}} {{solibs}} {{libs}} @$rspfile"
+    description = "$pretty_link_prefix Shared Library: {{output}}"
+    outputs = [
+      outfile,
+    ]
+    default_output_extension = ".so"
+    output_prefix = "lib"
+  }
+
+  tool("link") {
+    outfile = "{{target_out_dir}}/{{target_output_name}}/executables/{{target_output_name}}"
+    rspfile = "$outfile.rsp"
+    rspfile_content = "{{inputs}}"
+    command = "$ld -o $outfile $target_triple_command $sysroot_command $extra_system_lib_dirs_string {{ldflags}} {{solibs}} {{libs}} @$rspfile"
+    outputs = [
+      outfile,
+    ]
+    description = "$pretty_link_prefix Link Executable: {{target_output_name}}"
+  }
+
+  tool("stamp") {
+    command = "touch {{output}}"
+    description = "$pretty_build_prefix Stamp: {{output}}"
+  }
+}
