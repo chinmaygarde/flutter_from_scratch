@@ -9,6 +9,7 @@
 #include <chrono>
 #include <sstream>
 #include <vector>
+#include <unistd.h>
 
 #include "utils.h"
 
@@ -65,7 +66,7 @@ FlutterApplication::FlutterApplication(
         ->render_delegate_.OnApplicationGetOnscreenFBO();
   };
   config.open_gl.gl_proc_resolver =
-      [&render_delegate_](void *userdata, const char *name) -> void * {
+      [](void *userdata, const char *name) -> void * {
     return reinterpret_cast<FlutterApplication *>(userdata)
         ->render_delegate_.GetProcAddress(name);
   };
@@ -95,8 +96,7 @@ FlutterApplication::FlutterApplication(
       .command_line_argv = command_line_args_c.data(),
   };
 
-  FlutterEngine engine = nullptr;
-  auto result = FlutterEngineRun(FLUTTER_ENGINE_VERSION, &config, &args,
+    auto result = FlutterEngineRun(FLUTTER_ENGINE_VERSION, &config, &args,
                                  this /* userdata */, &engine_);
 
   if (result != kSuccess) {
@@ -176,7 +176,7 @@ bool FlutterApplication::SendFlutterPointerEvent(FlutterPointerPhase phase,
 void FlutterApplication::ReadInputEvents() {
   // TODO(chinmaygarde): Fill this in for touch screen and not just devices that
   // fake mice.
-  ::sleep(INT_MAX);
+  ::usleep(INT_MAX);
 }
 
 } // namespace flutter
