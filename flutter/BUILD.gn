@@ -21,6 +21,7 @@ executable("flutter") {
 
   libs = [
     "rt",
+    "ts",
     "brcmEGL",
     "brcmGLESv2",
     "flutter_engine",
