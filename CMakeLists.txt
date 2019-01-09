@@ -5,7 +5,7 @@ if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "CMAKE_BUILD_TYPE not set, defaulting to MinSizeRel.")
 endif()
 
-project(hello_pi LANGUAGES CXX)
+project(flutter LANGUAGES CXX)
 
 message(STATUS "Generator .............. ${CMAKE_GENERATOR}")
 message(STATUS "Build Type ............. ${CMAKE_BUILD_TYPE}")
@@ -39,6 +39,6 @@ set(cxx_sources
 )
 
 add_executable(flutter ${cxx_sources})
-target_link_libraries(flutter brcmGLESv2 brcmEGL bcm_host flutter_engine pthread dl)
+target_link_libraries(flutter ts brcmGLESv2 brcmEGL bcm_host flutter_engine pthread dl)
 
 install(TARGETS flutter RUNTIME DESTINATION bin)

@@ -9,7 +9,7 @@
 #include <chrono>
 #include <sstream>
 #include <vector>
-#include <unistd.h>
+#include <tslib.h>
 
 #include "utils.h"
 
@@ -174,9 +174,33 @@ bool FlutterApplication::SendFlutterPointerEvent(FlutterPointerPhase phase,
 }
 
 void FlutterApplication::ReadInputEvents() {
-  // TODO(chinmaygarde): Fill this in for touch screen and not just devices that
-  // fake mice.
-  ::usleep(INT_MAX);
+
+  struct tsdev *ts;
+
+  ts = ts_setup(NULL, 0);
+    if (!ts) {
+    exit(1);
+  }
+
+  while (1) {
+    struct ts_sample samp;
+    int ret;
+
+    ret = ts_read(ts, &samp, 1);
+
+    if (ret < 0) {
+      FLWAY_ERROR << "ts_read" << std::endl;
+      ts_close(ts);
+      exit(1);
+    }
+
+    if (ret != 1)
+      continue;
+
+    SendPointerEvent(samp.pressure, samp.x, samp.y);
+  }
+
+  ts_close(ts);
 }
 
 } // namespace flutter
