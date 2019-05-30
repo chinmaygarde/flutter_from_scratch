@@ -180,9 +180,11 @@ bool PiDisplay::OnApplicationContextMakeCurrent() {
   }
   if (::eglMakeCurrent(display_, surface_, surface_, context_) != EGL_TRUE) {
     FLWAY_ERROR << "Could not make the context current." << std::endl;
-
     return false;
+  } else {
+    FLWAY_LOG << "call OnApplicationContextMakeCurrent"  << std::endl;
   }
+
   return true;
 }
 
@@ -196,6 +198,8 @@ bool PiDisplay::OnApplicationContextClearCurrent() {
                        EGL_NO_CONTEXT) != EGL_TRUE) {
     FLWAY_ERROR << "Could not clear the current context." << std::endl;
     return false;
+  } else {
+    FLWAY_LOG << "call OnApplicationContextClearCurrent"  << std::endl;
   }
   return true;
 }
@@ -210,8 +214,27 @@ bool PiDisplay::OnApplicationPresent() {
   if (::eglSwapBuffers(display_, surface_) != EGL_TRUE) {
     FLWAY_ERROR << "Could not swap buffers to present the screen." << std::endl;
     return false;
+  } else {
+    FLWAY_LOG << "call OnApplicationPresent"  << std::endl;
   }
 
+  return true;
+}
+
+// |FlutterApplication::RenderDelegate|
+bool PiDisplay::OnApplicationMakeResourceCurrent(){
+  if (!valid_) {
+    FLWAY_ERROR << "Cannot make resource current an invalid display." << std::endl;
+    return false;
+  }
+        
+  if (::eglMakeCurrent(display_, surface_, surface_, context_) != EGL_TRUE) {
+    FLWAY_ERROR << "Could not make resource current." << std::endl;
+    return false;
+  } else {
+    FLWAY_LOG << "call OnApplicationMakeResourceCurrent"  << std::endl;
+  }
+  
   return true;
 }
 
@@ -228,6 +251,7 @@ void *PiDisplay::GetProcAddress(const char *name) {
   }
 
   if (auto address = dlsym(RTLD_DEFAULT, name)) {
+    FLWAY_LOG << "call GetProcAddress:" << name  << std::endl;
     return address;
   }
 

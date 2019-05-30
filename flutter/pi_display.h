@@ -53,6 +53,10 @@ private:
   // |FlutterApplication::RenderDelegate|
   void *GetProcAddress(const char *) override;
 
+   // |FlutterApplication::RenderDelegate|
+  bool OnApplicationMakeResourceCurrent() override;
+  
+
   FLWAY_DISALLOW_COPY_AND_ASSIGN(PiDisplay);
 };
 
