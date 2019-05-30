@@ -180,9 +180,30 @@ bool PiDisplay::OnApplicationContextMakeCurrent() {
   }
   if (::eglMakeCurrent(display_, surface_, surface_, context_) != EGL_TRUE) {
     FLWAY_ERROR << "Could not make the context current." << std::endl;
-
     return false;
+  } else {
+    FLWAY_LOG << "call OnApplicationContextMakeCurrent"  << std::endl;
   }
+
+
+// FLWAY_LOG << "getting OpenGL version" << std::endl;
+// #define GPU_GL_VERSION 0x1F02
+//   const char* (*gl_get_string)(uint32_t);
+//   gl_get_string = (const char* (*)(uint32_t)) dlsym(RTLD_DEFAULT,"glGetString");
+//   // auto str = ::glGetString(GPU_GL_VERSION);
+//   if (gl_get_string == 0){
+//     FLWAY_ERROR << "Failed resolve glGetString" << std::endl;
+//   } else {
+//     FLWAY_LOG << "Resolve glGetString - ok" << std::endl;
+//   }
+//   const char* version = gl_get_string(GPU_GL_VERSION);
+//   if (version == 0){
+//     FLWAY_ERROR << "Failed call glGetString" << std::endl;
+//   } else {
+//     // printf("OpenGL version: %s", version);
+//     FLWAY_LOG << "OpenGL version:" << version << std::endl;
+//   }
+
   return true;
 }
 
@@ -196,6 +217,8 @@ bool PiDisplay::OnApplicationContextClearCurrent() {
                        EGL_NO_CONTEXT) != EGL_TRUE) {
     FLWAY_ERROR << "Could not clear the current context." << std::endl;
     return false;
+  } else {
+    FLWAY_LOG << "call OnApplicationContextClearCurrent"  << std::endl;
   }
   return true;
 }
@@ -210,10 +233,28 @@ bool PiDisplay::OnApplicationPresent() {
   if (::eglSwapBuffers(display_, surface_) != EGL_TRUE) {
     FLWAY_ERROR << "Could not swap buffers to present the screen." << std::endl;
     return false;
+  } else {
+    FLWAY_LOG << "call OnApplicationPresent"  << std::endl;
   }
 
   return true;
 }
+
+   // |FlutterApplication::RenderDelegate|
+  bool PiDisplay::OnApplicationMakeResourceCurrent(){
+      if (!valid_) {
+      FLWAY_ERROR << "Cannot make resource current an invalid display." << std::endl;
+      return false;
+    }
+        
+    if (::eglMakeCurrent(display_, surface_, surface_, context_) != EGL_TRUE) {
+      FLWAY_ERROR << "Could not make resource current." << std::endl;
+      return false;
+    } else {
+      FLWAY_LOG << "call OnApplicationMakeResourceCurrent"  << std::endl;
+    }
+    return true;
+  }
 
 // |FlutterApplication::RenderDelegate|
 uint32_t PiDisplay::OnApplicationGetOnscreenFBO() {
@@ -227,7 +268,12 @@ void *PiDisplay::GetProcAddress(const char *name) {
     return nullptr;
   }
 
+
+  // if (void * address = (void *)::eglGetProcAddress(name)) {
+    // return address;
+  // }
   if (auto address = dlsym(RTLD_DEFAULT, name)) {
+    FLWAY_LOG << "call GetProcAddress:" << name  << std::endl;
     return address;
   }
 

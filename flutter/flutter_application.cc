@@ -70,6 +70,11 @@ FlutterApplication::FlutterApplication(
     return reinterpret_cast<FlutterApplication *>(userdata)
         ->render_delegate_.GetProcAddress(name);
   };
+  config.open_gl.make_resource_current =
+      [](void *userdata) -> bool {
+    return reinterpret_cast<FlutterApplication *>(userdata)
+        ->render_delegate_.OnApplicationMakeResourceCurrent();
+  };
 
   auto icu_data_path = GetICUDataPath();
 
@@ -94,7 +99,7 @@ FlutterApplication::FlutterApplication(
       .command_line_argv = command_line_args_c.data(),
   };
 
-    auto result = FlutterEngineRun(FLUTTER_ENGINE_VERSION, &config, &args,
+  auto result = FlutterEngineRun(FLUTTER_ENGINE_VERSION, &config, &args,
                                  this /* userdata */, &engine_);
 
   if (result != kSuccess) {

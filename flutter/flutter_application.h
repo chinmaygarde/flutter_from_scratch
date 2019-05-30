@@ -26,6 +26,8 @@ public:
     virtual uint32_t OnApplicationGetOnscreenFBO() = 0;
 
     virtual void *GetProcAddress(const char *) = 0;
+
+    virtual bool OnApplicationMakeResourceCurrent() = 0;
   };
 
   FlutterApplication(std::string bundle_path,
