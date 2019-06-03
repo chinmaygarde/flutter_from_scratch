@@ -11,8 +11,6 @@
 #include "flutter_application.h"
 #include "pi_display.h"
 #include "utils.h"
-#define  GLFW_INCLUDE_ES2 
-#include <glfw3.h>
 
 namespace flutter {
 
