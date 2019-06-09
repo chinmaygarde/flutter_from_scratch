@@ -89,24 +89,30 @@ int main(int argc, char **argv) {
   const auto assets_path = args[0];
   std::cout << "assets_path: " << assets_path << std::endl;
    if (!flutter::FlutterAssetBundleIsValid(assets_path)) {
-     std::cerr << "   <Invalid Flutter Asset Bundle>   " << std::endl;
+     std::cerr << "Warn:   <Invalid Flutter Asset Bundle>   " << std::endl;
 //     PrintUsage();
-     return EXIT_FAILURE;
+//     return EXIT_FAILURE;
    }
 
 //  std::cout << "Base dir: " << base_directory << std::endl;
 
   // Arguments for the Flutter Engine.
-  std::vector<std::string> arguments;
+//  std::vector<std::string> arguments;
 #ifdef NDEBUG
-  arguments.push_back("--disable-dart-asserts");
+   args.push_back("--disable-dart-asserts");
 #endif
+   args.erase(args.begin());
+   std::cout << "Arguments for the Flutter Engine:";
+     for (unsigned i=0; i<args.size(); ++i){
+       std::cout << args[i] << std::endl;
+    }
+
 
   flutter::FlutterWindowController flutter_controller(icu_data_path);
 
   // Start the engine.
   if (!flutter_controller.CreateWindow(800, 600, "Flutter Desktop Example",
-                                       assets_path, arguments)) {
+                                       assets_path, args)) {
     return EXIT_FAILURE;
   }
 
