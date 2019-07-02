@@ -222,7 +222,7 @@ uint32_t PiDisplay::OnApplicationGetOnscreenFBO() {
 }
 
 // |FlutterApplication::RenderDelegate|
-void *PiDisplay::GetProcAddress(const char *) {
+void *PiDisplay::GetProcAddress(const char *name) {
   if (name == nullptr) {
     return nullptr;
   }

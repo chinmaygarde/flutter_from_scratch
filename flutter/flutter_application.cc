@@ -5,8 +5,10 @@
 #include "flutter_application.h"
 
 #include <sys/types.h>
+#include <unistd.h>
 
 #include <chrono>
+#include <climits>
 #include <sstream>
 #include <vector>
 
@@ -64,8 +66,8 @@ FlutterApplication::FlutterApplication(
     return reinterpret_cast<FlutterApplication *>(userdata)
         ->render_delegate_.OnApplicationGetOnscreenFBO();
   };
-  config.open_gl.gl_proc_resolver =
-      [&render_delegate_](void *userdata, const char *name) -> void * {
+  config.open_gl.gl_proc_resolver = [](void *userdata,
+                                       const char *name) -> void * {
     return reinterpret_cast<FlutterApplication *>(userdata)
         ->render_delegate_.GetProcAddress(name);
   };
@@ -88,8 +90,6 @@ FlutterApplication::FlutterApplication(
   FlutterProjectArgs args = {
       .struct_size = sizeof(FlutterProjectArgs),
       .assets_path = bundle_path.c_str(),
-      .main_path = "",
-      .packages_path = "",
       .icu_data_path = icu_data_path.c_str(),
       .command_line_argc = static_cast<int>(command_line_args_c.size()),
       .command_line_argv = command_line_args_c.data(),
