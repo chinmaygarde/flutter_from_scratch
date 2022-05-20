@@ -27,13 +27,13 @@ rm -rf "${SDK_DIR}"
 mkdir -p "${SDK_DIR}"
 
 echo "Settng up Toolchain..."
-wget -O "${SDK_DIR}/toolchain.tar.gz" "https://storage.googleapis.com/xcompile_sdk/pi/toolchain/${TOOLCHAIN_NAME}.tar.gz"
+wget -O "${SDK_DIR}/toolchain.tar.gz" "https://public.chinmaygarde.com/xcompile/toolchain/${TOOLCHAIN_NAME}.tar.gz"
 tar -xzvf "${SDK_DIR}/toolchain.tar.gz" -C "${SDK_DIR}"
 rm "${SDK_DIR}/toolchain.tar.gz"
 mv "${SDK_DIR}/${TOOLCHAIN_NAME}" "${SDK_DIR}/toolchain"
 
 echo "Setting up Sysroot..."
-wget -O "${SDK_DIR}/sysroot.tar.gz" "https://storage.googleapis.com/xcompile_sdk/pi/sysroot.tar.gz"
+wget -O "${SDK_DIR}/sysroot.tar.gz" "https://public.chinmaygarde.com/xcompile/sysroot.tar.gz"
 tar -xzvf "${SDK_DIR}/sysroot.tar.gz" -C "${SDK_DIR}"
 rm "${SDK_DIR}/sysroot.tar.gz"
 
